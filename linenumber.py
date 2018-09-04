@@ -1,5 +1,5 @@
 from tkinter import * 
-from tkinter import Canvas, Text, Frame
+from tkinter import Canvas, Text
 
 class LineNumber(Canvas):
     def __init__(self,*args,**kwargs):
