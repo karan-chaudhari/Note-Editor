@@ -4,7 +4,6 @@ Developed by : Karan Chaudhari
 
 from tkinter import *
 from tkinter import TclError, StringVar
-from tkinter.font import Font
 from PIL import Image, ImageTk
 from tkinter.font import Font
 from tkinter import messagebox, filedialog, simpledialog
