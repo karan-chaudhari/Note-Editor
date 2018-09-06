@@ -627,7 +627,6 @@ class SearchDialog(SearchDialogBase):
             text.see("insert")
             return True
         if not res:
-            messagebox.showinfo("Find","Sorry cannot find")
             self.bell()
             return False
 
@@ -683,7 +682,6 @@ class ReplaceDialog(SearchDialogBase):
         text = self.text
         res = self.engine.search_text(text, prog)
         if not res:
-            messagebox.showinfo("Replace","Sorry cannot replace")
             self.bell()
             return False
         text.tag_remove("sel","1.0","end")
@@ -727,7 +725,6 @@ class ReplaceDialog(SearchDialogBase):
         text = self.text
         res = self.engine.search_text(text, prog)
         if not res:
-            messagebox.showinfo("Replace All","Sorry cannot replace")
             self.bell()
             return
         text.tag_remove("sel","1.0","end")
@@ -783,7 +780,6 @@ class ReplaceDialog(SearchDialogBase):
         text = self.text
         res = self.engine.search_text(text, None, ok)
         if not res:
-            messagebox.showinfo("Find","Sorry Cannot Find")
             self.bell()
             return False
         line, m = res
