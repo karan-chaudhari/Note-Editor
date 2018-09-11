@@ -71,15 +71,7 @@ class Note_Editor:
         # ************************    Create About Menu   *************************************
         aboutmenu = Menu(self.mainmenu, tearoff=0)
         self.mainmenu.add_cascade(label="About", menu=aboutmenu)
-        aboutmenu.add_command(label="About Note Editor", command=self.about)
-
-        def undo_block_start():
-            """Created For Replace Function"""
-            pass
-
-        def undo_block_stop():
-            """Created For Replace Function"""
-            pass    
+        aboutmenu.add_command(label="About Note Editor", command=self.about) 
 
         # ************************   Create Toolbar Menu   ***********************************
         self.toolbar = Frame(root, relief=FLAT)
@@ -216,8 +208,6 @@ class Note_Editor:
         frame = Frame(root)
         self.scrollbar = Scrollbar(frame, orient=VERTICAL)
         self.text = CustomText(frame, yscrollcommand=self.scrollbar.set, inactiveselectbackground='grey') # inactiveselectbackground is used for find and replace function
-        self.text.undo_block_start = undo_block_start
-        self.text.undo_block_stop = undo_block_stop
         self.linenumber = LineNumber(frame, width=30)
         self.linenumber.attach(self.text)
         self.linenumber.pack(side=LEFT, fill=Y)
@@ -227,6 +217,7 @@ class Note_Editor:
         self.status()
         frame.pack(fill=BOTH, side=LEFT, expand=1)
 
+        # Bind text with _on_update function
         self.text.bind("<<Change>>", self._on_update)
         self.text.bind("<<Configure>>", self._on_update)
 
@@ -633,7 +624,6 @@ class SearchDialog(SearchDialogBase):
 class ReplaceDialog(SearchDialogBase):
     """Create Class For Replace Function"""
     title = "Replace Dialog"
-    icon = "Replace"
     def __init__(self, root, engine, *args):
         SearchDialogBase.__init__(self, root, engine)
         self.replvar = StringVar(root)
@@ -659,7 +649,7 @@ class ReplaceDialog(SearchDialogBase):
 
     def create_command_buttons(self, *args):
         SearchDialogBase.create_command_buttons(self)
-        self.make_button("Find", self.do_find)
+        self.make_button("Find", self.find_it)
         self.make_button("Replace", self.replace)
         self.make_button("Replace+Find", self.default_command, 1)
         self.make_button("Replace All", self.replace_all)   
@@ -684,19 +674,9 @@ class ReplaceDialog(SearchDialogBase):
         if not res:
             self.bell()
             return False
-        text.tag_remove("sel","1.0","end")
-        text.tag_remove("hit","1.0","end")
-        line = res[1] 
-        col = res[1].start()   
-        if self.engine.iswrap():
-            line = 1
-            col = 0
-        ok = 1
         first = last = None
-        text.undo_block_start()
         if res:
             line, m = res
-            chars = text.get("%d.0" % line, "%d.0" % (line+1))
             orig = m.group()
             new = self._replace_expand(m, repl)
             i, j = m.span()
@@ -710,9 +690,6 @@ class ReplaceDialog(SearchDialogBase):
                     text.delete(first, last)
                 if new:
                     text.insert(first, new)
-            col = i + len(new)
-            ok = 0
-        text.undo_block_stop()
         if first and last:
             self.show_hit(first, last)
 
@@ -727,22 +704,15 @@ class ReplaceDialog(SearchDialogBase):
         if not res:
             self.bell()
             return
-        text.tag_remove("sel","1.0","end")
-        text.tag_remove("hit","1.0","end")
         line = res[0]
         col = res[1].start()
-        if self.engine.iswrap():
-            line = 1
-            col = 0
         ok = 1
         first = last = None
-        text.undo_block_start()
-        while 1:
-            res = self.engine.search_forward(text, prog, line, col, 0, ok) 
+        while True:
+            res = self.engine.search_forward(text, prog, line, col, ok) 
             if not res:
                 break
             line , m = res
-            chars = text.get("%d.0" % line, "%d.0" % (line+1)) 
             orig = m.group()
             new = self._replace_expand(m, repl) 
             if new is None:
@@ -757,10 +727,7 @@ class ReplaceDialog(SearchDialogBase):
                 if first != last:
                     text.delete(first, last) 
                 if new:
-                    text.insert(first, new)
-            col = i + len(new)
-            ok = 0
-        text.undo_block_stop()        
+                    text.insert(first, new)      
         if first and last:
             self.show_hit(first, last)
         self.close()                
@@ -802,10 +769,6 @@ class ReplaceDialog(SearchDialogBase):
             text.tag_add("hit", first, last)
         text.see("insert")
         text.update_idletasks()
-
-    def close(self, event=None, *args):
-        SearchDialogBase.close(self, event)
-        self.text.tag_remove("hit","1.0","end")            
 
 def setup(text):
     """Create window for Find"""
