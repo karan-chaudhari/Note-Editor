@@ -9,7 +9,7 @@ from tkinter.font import Font
 from tkinter import messagebox, filedialog, simpledialog
 from idlelib.searchbase import SearchDialogBase
 from idlelib import searchengine
-from idlelib import search, windows
+from idlelib import search
 from linenumber import LineNumber, CustomText
 import tkinter.colorchooser
 import os, time
